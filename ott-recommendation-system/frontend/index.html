@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AURA - OTT Recommendations & MLOps Dashboard</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- ChartJS for Telemetry -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="glass-bg"></div>
+    <div class="glow glow-1"></div>
+    <div class="glow glow-2"></div>
+
+    <div class="app-container">
+        <!-- HEADER -->
+        <header class="app-header">
+            <div class="logo">
+                <i class="fa-solid fa-wand-magic-sparkles brand-icon"></i>
+                <h1>AURA<span>OTT</span></h1>
+            </div>
+            <div class="header-meta">
+                <div class="meta-tag">
+                    <span class="meta-label">Model:</span>
+                    <span id="model-version-tag" class="meta-value">Loading...</span>
+                </div>
+                <div class="system-status-pill" id="system-status">
+                    <span class="pulse-dot"></span>
+                    <span id="status-text">Connecting...</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- MAIN LAYOUT -->
+        <main class="dashboard-grid">
+            
+            <!-- LEFT PANEL: OTT RECOMMENDATION CLIENT -->
+            <section class="panel-section client-panel">
+                <div class="panel-header">
+                    <h2><i class="fa-solid fa-clapperboard"></i> OTT Streaming Hub</h2>
+                    <p class="panel-subtitle">Simulate personalized user recommendation requests</p>
+                </div>
+                
+                <!-- User Selector Card -->
+                <div class="card user-card">
+                    <div class="user-selector-group">
+                        <label for="user-select">Select Active User Profile:</label>
+                        <div class="custom-select-wrapper">
+                            <select id="user-select">
+                                <option value="1">User 1 (Sci-Fi & Action Preference)</option>
+                                <option value="16">User 16 (Drama & Comedy Preference)</option>
+                                <option value="35">User 35 (Horror & Action Preference)</option>
+                                <option value="101">User 101 (New Cold-Start User)</option>
+                            </select>
+                            <i class="fa-solid fa-chevron-down select-arrow"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recommendation Shelf -->
+                <div class="shelf-container">
+                    <h3>Recommended for You</h3>
+                    <div class="movie-grid" id="movie-grid">
+                        <!-- Movies injected dynamically -->
+                        <div class="loading-state">
+                            <i class="fa-solid fa-circle-notch fa-spin"></i>
+                            <p>Fetching recommendations...</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- RIGHT PANEL: MLOPS MONITORING CENTER -->
+            <section class="panel-section monitoring-panel">
+                <div class="panel-header">
+                    <h2><i class="fa-solid fa-chart-line"></i> MLOps Monitoring Suite</h2>
+                    <p class="panel-subtitle">Real-time inference logs, data drift tracking & model retraining</p>
+                </div>
+
+                <!-- Metrics Grid -->
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <div class="metric-icon blue"><i class="fa-solid fa-bolt"></i></div>
+                        <div class="metric-info">
+                            <span class="metric-val" id="metric-latency">0 ms</span>
+                            <span class="metric-lbl">Avg Latency</span>
+                        </div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-icon purple"><i class="fa-solid fa-chart-simple"></i></div>
+                        <div class="metric-info">
+                            <span class="metric-val" id="metric-requests">0</span>
+                            <span class="metric-lbl">Total Recommendations</span>
+                        </div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-icon green"><i class="fa-solid fa-database"></i></div>
+                        <div class="metric-info">
+                            <span class="metric-val" id="metric-ratings">0</span>
+                            <span class="metric-lbl">Feedback Datapoints</span>
+                        </div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-icon orange"><i class="fa-solid fa-triangle-exclamation"></i></div>
+                        <div class="metric-info">
+                            <span class="metric-val" id="metric-drift">0.0000</span>
+                            <span class="metric-lbl">Drift Index (PSI)</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Charts Area -->
+                <div class="charts-container">
+                    <div class="card chart-card">
+                        <h4>Rating Distribution Drift Check</h4>
+                        <div class="chart-wrapper">
+                            <canvas id="drift-chart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Controls & Retraining -->
+                <div class="card control-card">
+                    <div class="control-header">
+                        <h4>Simulation & Pipeline Control</h4>
+                        <span class="pipeline-status" id="pipeline-status">Idle</span>
+                    </div>
+                    <div class="control-actions">
+                        <button class="btn btn-warning" id="btn-drift-neg">
+                            <i class="fa-solid fa-chart-line-down"></i> Force Rating Drop
+                        </button>
+                        <button class="btn btn-warning" id="btn-drift-pos">
+                            <i class="fa-solid fa-chart-line-up"></i> Force Rating Spike
+                        </button>
+                        <button class="btn btn-primary" id="btn-retrain">
+                            <i class="fa-solid fa-rotate"></i> Trigger Retraining
+                        </button>
+                    </div>
+                    <div class="progress-bar-container" id="progress-container" style="display: none;">
+                        <div class="progress-bar-fill" id="progress-fill"></div>
+                    </div>
+                </div>
+
+                <!-- Console logs -->
+                <div class="card console-card">
+                    <div class="console-header">
+                        <h4>System Logs Console</h4>
+                        <button class="btn-clear" id="btn-clear-console"><i class="fa-solid fa-trash-can"></i> Clear</button>
+                    </div>
+                    <div class="console-body" id="console-logs">
+                        <div class="log-line system">[SYSTEM] Dashboard initialized and listening for telemetry events...</div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Rating Modal -->
+    <div class="modal-backdrop" id="rating-modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Rate Movie</h3>
+                <button class="modal-close-btn" id="modal-close"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="modal-body">
+                <p>How would you rate <strong id="modal-movie-title">Movie</strong>?</p>
+                <div class="rating-stars" id="modal-stars">
+                    <i class="fa-regular fa-star star-btn" data-star="1"></i>
+                    <i class="fa-regular fa-star star-btn" data-star="2"></i>
+                    <i class="fa-regular fa-star star-btn" data-star="3"></i>
+                    <i class="fa-regular fa-star star-btn" data-star="4"></i>
+                    <i class="fa-regular fa-star star-btn" data-star="5"></i>
+                </div>
+                <div class="rating-value-label"><span id="rating-num-label">3.0</span> / 5.0</div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="modal-cancel">Cancel</button>
+                <button class="btn btn-primary" id="modal-submit">Submit Rating</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/app.js"></script>
+</body>
+</html>
