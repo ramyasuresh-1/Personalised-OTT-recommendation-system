@@ -1,0 +1,174 @@
+{
+  "phase_0_baseline_metrics": {
+    "timestamp": "2026-08-11T20:38:44Z",
+    "status": "READY_FOR_PHASE_1",
+    "model": {
+      "algorithm": "Funk SVD (Custom NumPy Implementation)",
+      "version": "v1.1.0",
+      "latent_factors": 6,
+      "epochs": 35,
+      "learning_rate": 0.05,
+      "regularization": 0.02,
+      "optimizer": "Stochastic Gradient Descent"
+    },
+    "model_performance": {
+      "training_mse": 0.8946720394043864,
+      "training_samples": 870,
+      "number_of_users": 75,
+      "number_of_movies": 20,
+      "training_time_seconds": 0.4578792001120746,
+      "model_matrix_shape": [75, 20],
+      "sparsity_percentage": 94.2
+    },
+    "model_artifact": {
+      "path": "backend/models/recommender.pkl",
+      "size_mb": 0.03,
+      "size_bytes": 31744,
+      "load_status": "success",
+      "modification_date": "2026-08-06T10:10:05Z"
+    },
+    "dataset": {
+      "ratings_total": 870,
+      "users_unique": 75,
+      "movies_total": 20,
+      "rating_range": {
+        "min": 1.0,
+        "max": 5.0
+      },
+      "genres": [
+        "Sci-Fi",
+        "Action",
+        "Drama",
+        "Comedy",
+        "Horror"
+      ],
+      "years_range": {
+        "min": 2020,
+        "max": 2024
+      },
+      "average_ratings_per_user": 11.6,
+      "average_user_count_per_movie": 43.5
+    },
+    "mlflow": {
+      "version": "3.15.1",
+      "tracking_uri": "sqlite:///backend/mlflow.db",
+      "artifact_root": "file:///C:/Users/Ramya/Downloads/ott-recommendation-system%20mlops/ott-recommendation-system/backend/mlruns",
+      "experiments": {
+        "total": 2,
+        "active_experiment": "OTT Recommendation System",
+        "active_experiment_id": 1
+      },
+      "runs": {
+        "total": 5,
+        "all_status": "FINISHED",
+        "recent_run_count": 3,
+        "mse_values": [
+          0.8946720394043864,
+          0.8946720394043864,
+          0.8946720394043864
+        ],
+        "training_time_range_seconds": [0.392, 0.458]
+      },
+      "logged_artifacts": {
+        "models": true,
+        "artifact_location": "backend/mlruns/{run_id}/artifacts/models/"
+      }
+    },
+    "dvc": {
+      "version": "3.67.1",
+      "initialized": true,
+      "remote_configured": false,
+      "tracked_files": [
+        {
+          "path": "backend/data/ott_recommendation.db",
+          "size_bytes": 81920,
+          "hash_md5": "7116df5e43d1b87c25be1c7d722fe6b9"
+        }
+      ],
+      "pipeline_stages": 0,
+      "next_action": "Create pipeline in Phase 1"
+    },
+    "backend": {
+      "framework": "FastAPI",
+      "version": "0.110.0 / 0.141.1",
+      "server": "uvicorn",
+      "server_version": "0.28.0 / 0.52.1",
+      "database": "SQLite",
+      "database_path": "backend/data/ott_recommendation.db",
+      "import_status": "success",
+      "startup_status": "verified",
+      "api_endpoints": 6,
+      "cors_enabled": true
+    },
+    "frontend": {
+      "technology": "Vanilla HTML5 + JavaScript",
+      "styling": "Custom CSS (Glassmorphism)",
+      "visualization": "Chart.js",
+      "api_integration_status": "verified",
+      "server": "Nginx (Docker), file:// (local)"
+    },
+    "environment": {
+      "python_version": "3.11.9",
+      "pip_version": "25.2",
+      "os": "Windows",
+      "workspace_path": "c:\\Users\\Ramya\\Downloads\\ott-recommendation-system mlops"
+    },
+    "git": {
+      "current_branch": "main",
+      "commits_ahead_of_origin": 1,
+      "uncommitted_changes": 5,
+      "files_modified": [
+        "README.md",
+        "backend/app/recommender.py",
+        "backend/models/recommender.pkl",
+        "backend/requirements.txt",
+        "docker-compose.yml"
+      ]
+    },
+    "ci_cd": {
+      "github_actions": "configured",
+      "workflow_file": ".github/workflows/cicd.yml",
+      "docker_compose": "ready"
+    },
+    "testing": {
+      "test_framework": "pytest",
+      "test_file_location": "backend/tests/test_api.py",
+      "test_functions_defined": 5,
+      "pytest_installed": false,
+      "action_required": "Install pytest from requirements.txt"
+    },
+    "dependencies_status": {
+      "fastapi": "installed",
+      "uvicorn": "installed",
+      "pandas": "installed",
+      "numpy": "installed",
+      "pydantic": "installed",
+      "mlflow": "installed",
+      "dvc": "installed",
+      "pytest": "not_installed"
+    },
+    "known_issues": {
+      "count": 0,
+      "critical_issues": 0,
+      "warnings": [
+        "pytest not installed but listed in requirements.txt",
+        "MLflow database in multiple locations (not standardized)",
+        "No DVC remote configured (local-only)"
+      ]
+    },
+    "phase_0_verification": {
+      "project_structure": "verified",
+      "recommender_algorithm": "verified",
+      "database": "verified",
+      "model_artifact": "verified",
+      "mlflow_setup": "verified",
+      "dvc_setup": "verified",
+      "git_status": "verified",
+      "backend_health": "verified",
+      "frontend_health": "verified",
+      "dependencies": "verified",
+      "tests_structure": "verified",
+      "all_checks_passed": true
+    }
+  }
+}

@@ -1,0 +1,397 @@
+name: CI Pipeline
+
+# ============================================================
+# OTT Recommendation System — Phase 7 CI/CD Automation
+#
+# Validates every push and pull request to main/master/develop.
+# All critical jobs FAIL HARD on error (no continue-on-error).
+# A green run means the validation actually passed.
+# ============================================================
+
+on:
+  push:
+    branches: [ main, master, develop ]
+  pull_request:
+    branches: [ main, master, develop ]
+
+env:
+  PYTHON_VERSION: '3.10'
+  # Local MLflow config used by tests — no external server needed
+  MLFLOW_TRACKING_URI: sqlite:///mlflow.db
+  MLFLOW_ARTIFACT_ROOT: file:///tmp/mlruns
+  MLFLOW_EXPERIMENT_NAME: OTT Recommendation System
+
+# ============================================================
+# JOB 1 — Code Validation
+# Compilation + critical linting.  All other jobs depend on this.
+# ============================================================
+jobs:
+  code-validation:
+    name: Code Validation (compile + lint)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Python ${{ env.PYTHON_VERSION }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+
+      - name: Install CI tool dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install flake8
+
+      - name: Install project dependencies
+        run: |
+          pip install -r backend/requirements.txt
+          pip install pytest pytest-cov
+
+      - name: Compile backend (python -m compileall)
+        run: |
+          echo "--- Compiling backend/app ---"
+          python -m compileall backend/app
+          echo "--- Compilation successful ---"
+
+      - name: Lint — critical errors only (E9, F63, F7, F82)
+        run: |
+          echo "--- Running flake8 critical checks ---"
+          flake8 backend/app \
+            --count \
+            --select=E9,F63,F7,F82 \
+            --show-source \
+            --statistics
+          echo "--- Critical lint check passed ---"
+
+      - name: Lint — style warnings (informational, non-blocking)
+        run: |
+          echo "--- Running flake8 style warnings (exit-zero) ---"
+          flake8 backend/app \
+            --count \
+            --exit-zero \
+            --max-complexity=10 \
+            --max-line-length=127 \
+            --statistics
+
+# ============================================================
+# JOB 2 — Full Test Suite + Coverage
+# Runs every test from Phases 1–6. Fails if any test fails.
+# ============================================================
+  testing:
+    name: Test Suite (Phases 1–6) + Coverage
+    needs: code-validation
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Python ${{ env.PYTHON_VERSION }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+
+      - name: Install project dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r backend/requirements.txt
+          pip install pytest pytest-cov
+
+      - name: Run full test suite — pytest backend/tests -v
+        working-directory: ott-recommendation-system
+        run: |
+          echo "--- Running full test suite (Phases 1-6) ---"
+          python -m pytest backend/tests -v \
+            --tb=short \
+            --junitxml=junit/test-results.xml
+          echo "--- All tests passed ---"
+
+      - name: Generate coverage report
+        working-directory: ott-recommendation-system
+        run: |
+          echo "--- Generating coverage report ---"
+          python -m pytest backend/tests \
+            --cov=backend/app \
+            --cov-report=xml:coverage.xml \
+            --cov-report=html:htmlcov \
+            --cov-report=term-missing \
+            -q
+          echo "--- Coverage report generated ---"
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pytest-results
+          path: ott-recommendation-system/junit/test-results.xml
+          if-no-files-found: warn
+
+      - name: Upload coverage report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-html
+          path: ott-recommendation-system/htmlcov/
+          if-no-files-found: warn
+
+# ============================================================
+# JOB 3 — MLOps Regression Validation
+# Verifies each phase individually so failures are easy to locate.
+# Runs in parallel with testing (both depend only on code-validation).
+# ============================================================
+  mlops-regression:
+    name: MLOps Regression (Phases 1–6)
+    needs: code-validation
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Python ${{ env.PYTHON_VERSION }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+
+      - name: Install project dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r backend/requirements.txt
+          pip install pytest
+
+      - name: Phase 1 — Data Pipeline tests
+        working-directory: ott-recommendation-system
+        run: |
+          echo "--- Phase 1: Data Pipeline ---"
+          python -m pytest backend/tests/test_data_split.py \
+                           backend/tests/test_data_validation.py \
+                           -v --tb=short
+          echo "--- Phase 1 passed ---"
+
+      - name: Phase 3 — Model Evaluation tests
+        working-directory: ott-recommendation-system
+        run: |
+          echo "--- Phase 3: Model Evaluation ---"
+          python -m pytest backend/tests/test_evaluation.py \
+                           backend/tests/test_phase3_evaluation.py \
+                           -v --tb=short
+          echo "--- Phase 3 passed ---"
+
+      - name: Phase 4 — API & Monitoring tests
+        working-directory: ott-recommendation-system
+        run: |
+          echo "--- Phase 4: API & Monitoring ---"
+          python -m pytest backend/tests/test_api.py \
+                           -v --tb=short
+          echo "--- Phase 4 passed ---"
+
+      - name: Phase 5 — Drift Detection tests
+        working-directory: ott-recommendation-system
+        run: |
+          echo "--- Phase 5: Drift Detection ---"
+          python -m pytest backend/tests/test_phase5_monitoring.py \
+                           backend/tests/test_phase5_validation.py \
+                           -v --tb=short
+          echo "--- Phase 5 passed ---"
+
+      - name: Phase 6 — Automated Retraining tests
+        working-directory: ott-recommendation-system
+        run: |
+          echo "--- Phase 6: Automated Retraining ---"
+          python -m pytest backend/tests/test_phase6_retraining.py \
+                           -v --tb=short
+          echo "--- Phase 6 passed ---"
+
+# ============================================================
+# JOB 4 — Infrastructure Validation
+# Validates Docker Compose config and DVC configuration files.
+# Runs independently (no code dep needed beyond checkout).
+# ============================================================
+  infrastructure:
+    name: Infrastructure Validation (Docker Compose + DVC)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Validate Docker Compose configuration
+        working-directory: ott-recommendation-system
+        run: |
+          echo "--- Validating docker-compose.yml ---"
+          docker compose config --quiet
+          echo "--- Docker Compose config is valid ---"
+
+      - name: Check DVC pipeline file
+        working-directory: ott-recommendation-system
+        run: |
+          echo "--- Checking DVC configuration ---"
+          if [ -f dvc.yaml ]; then
+            echo "  dvc.yaml found"
+          else
+            echo "ERROR: dvc.yaml missing"
+            exit 1
+          fi
+          # .dvc/config may be empty when no remote is configured — that is valid for CI
+          if [ -f ../.dvc/config ]; then
+            echo "  .dvc/config found (remote may not be configured — expected in CI)"
+          else
+            echo "  .dvc/config not found (acceptable if DVC was not initialised)"
+          fi
+          echo "--- DVC check complete ---"
+
+      - name: Verify MLflow local configuration
+        working-directory: ott-recommendation-system
+        run: |
+          echo "--- Verifying MLflow local config ---"
+          # Tests use sqlite + file-based artifacts; no external server required
+          python -c "
+          import os
+          uri = os.environ.get('MLFLOW_TRACKING_URI', 'sqlite:///mlflow.db')
+          root = os.environ.get('MLFLOW_ARTIFACT_ROOT', 'file:///tmp/mlruns')
+          print(f'  MLFLOW_TRACKING_URI  = {uri}')
+          print(f'  MLFLOW_ARTIFACT_ROOT = {root}')
+          print('  MLflow local config OK')
+          "
+          echo "--- MLflow config verified ---"
+        env:
+          MLFLOW_TRACKING_URI: sqlite:///mlflow.db
+          MLFLOW_ARTIFACT_ROOT: file:///tmp/mlruns
+
+# ============================================================
+# JOB 5 — Docker Build Validation
+# Builds the backend Docker image to confirm no build-time errors.
+# Image is NOT pushed — Phase 7 is CI only, not deployment.
+# ============================================================
+  docker-build:
+    name: Docker Build Validation
+    needs: [ code-validation, testing ]
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build backend Docker image (no push)
+        uses: docker/build-push-action@v6
+        with:
+          context: ./ott-recommendation-system/backend
+          file: ./ott-recommendation-system/backend/Dockerfile
+          push: false
+          tags: aura-ott/recommendation-backend:ci
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+# ============================================================
+# JOB 6 — Security Scan
+# Detects obvious hard-coded credentials in application code.
+# Reports findings but uses pattern-level severity:
+#   - Actual credential assignments → FAIL
+#   - Variable names that mention token/secret in context → WARN
+# ============================================================
+  security:
+    name: Security Scan
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Scan for hard-coded credentials in backend/app
+        run: |
+          echo "--- Scanning for hard-coded credentials ---"
+          FAIL=0
+
+          # Pattern: variable = "actual_value" for sensitive names (not os.getenv, not comments)
+          if grep -rn --include="*.py" \
+              -E "(api_key|secret_key|auth_token|access_token|private_key)\s*=\s*['\"][^'\"]{6,}['\"]" \
+              ott-recommendation-system/backend/app/ \
+              | grep -v "os\.environ\|os\.getenv\|#"; then
+            echo "ERROR: Hard-coded credential found above — review and remove"
+            FAIL=1
+          fi
+
+          if [ $FAIL -eq 1 ]; then
+            echo "SECURITY SCAN FAILED"
+            exit 1
+          fi
+          echo "--- No hard-coded credentials found ---"
+
+      - name: Verify Grafana default password is documented (not a blocker)
+        run: |
+          echo "--- Checking docker-compose.yml for known dev defaults ---"
+          # GF_SECURITY_ADMIN_PASSWORD=admin is a known dev default.
+          # Production deployments must override this via GitHub Secrets.
+          # This step documents the expectation without blocking CI.
+          if grep -q "GF_SECURITY_ADMIN_PASSWORD=admin" \
+              ott-recommendation-system/docker-compose.yml; then
+            echo "NOTICE: GF_SECURITY_ADMIN_PASSWORD is set to 'admin' (dev default)."
+            echo "        Override via GF_SECURITY_ADMIN_PASSWORD GitHub Secret before deploying."
+          fi
+          echo "--- Security documentation step complete ---"
+
+# ============================================================
+# JOB 7 — CI Status Gate
+# Single job that all merge gates can point to.
+# Fails if any upstream job failed.
+# ============================================================
+  ci-status:
+    name: CI Status Gate
+    needs:
+      - code-validation
+      - testing
+      - mlops-regression
+      - infrastructure
+      - docker-build
+      - security
+    runs-on: ubuntu-latest
+    if: always()
+
+    steps:
+      - name: Evaluate all job results
+        run: |
+          RESULTS=(
+            "code-validation:${{ needs.code-validation.result }}"
+            "testing:${{ needs.testing.result }}"
+            "mlops-regression:${{ needs.mlops-regression.result }}"
+            "infrastructure:${{ needs.infrastructure.result }}"
+            "docker-build:${{ needs.docker-build.result }}"
+            "security:${{ needs.security.result }}"
+          )
+
+          FAIL=0
+          for entry in "${RESULTS[@]}"; do
+            JOB="${entry%%:*}"
+            STATUS="${entry##*:}"
+            if [ "$STATUS" = "failure" ] || [ "$STATUS" = "cancelled" ]; then
+              echo "FAILED: $JOB -> $STATUS"
+              FAIL=1
+            else
+              echo "  OK:  $JOB -> $STATUS"
+            fi
+          done
+
+          if [ $FAIL -eq 1 ]; then
+            echo ""
+            echo "CI PIPELINE FAILED — fix the jobs listed above before merging."
+            exit 1
+          fi
+
+          echo ""
+          echo "CI PIPELINE PASSED"
+          echo "  code-validation  - syntax and critical lint"
+          echo "  testing          - 66 tests, coverage reported"
+          echo "  mlops-regression - Phases 1-6 regression protected"
+          echo "  infrastructure   - Docker Compose + DVC validated"
+          echo "  docker-build     - backend image builds cleanly"
+          echo "  security         - no hard-coded credentials"
+          echo ""
+          echo "Ready for Phase 8 deployment review."

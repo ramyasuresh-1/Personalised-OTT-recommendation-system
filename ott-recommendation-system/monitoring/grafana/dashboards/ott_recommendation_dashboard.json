@@ -1,0 +1,263 @@
+{
+  "id": null,
+  "uid": "ott-reco-001",
+  "title": "OTT Recommendation Monitoring",
+  "tags": ["monitoring", "recommendation"],
+  "timezone": "browser",
+  "schemaVersion": 39,
+  "version": 2,
+  "refresh": "15s",
+  "panels": [
+    {
+      "type": "row",
+      "title": "Application",
+      "gridPos": {"h": 1, "w": 24, "x": 0, "y": 0}
+    },
+    {
+      "type": "stat",
+      "title": "API Request Rate (per sec)",
+      "targets": [{"expr": "sum(rate(http_requests_total[1m]))", "legendFormat": "req/s"}],
+      "gridPos": {"h": 5, "w": 6, "x": 0, "y": 1},
+      "options": {"reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": false}, "graphMode": "area", "colorMode": "background", "justifyMode": "center", "textMode": "value_and_name"}
+    },
+    {
+      "type": "timeseries",
+      "title": "API Latency (p95, seconds)",
+      "targets": [{"expr": "histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket[1m])) by (le))", "legendFormat": "p95"}],
+      "gridPos": {"h": 5, "w": 12, "x": 6, "y": 1}
+    },
+    {
+      "type": "stat",
+      "title": "HTTP Errors (per sec)",
+      "targets": [{"expr": "sum(rate(http_request_errors_total[1m]))", "legendFormat": "errors/s"}],
+      "gridPos": {"h": 5, "w": 6, "x": 18, "y": 1},
+      "options": {"reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": false}, "graphMode": "area", "colorMode": "background", "justifyMode": "center", "textMode": "value_and_name"}
+    },
+    {
+      "type": "row",
+      "title": "Recommendations",
+      "gridPos": {"h": 1, "w": 24, "x": 0, "y": 6}
+    },
+    {
+      "type": "stat",
+      "title": "Recommendation Requests (per sec)",
+      "targets": [{"expr": "sum(rate(recommendation_requests_total[1m]))", "legendFormat": "recs/s"}],
+      "gridPos": {"h": 5, "w": 6, "x": 0, "y": 7}
+    },
+    {
+      "type": "stat",
+      "title": "Recommendation Failures (per sec)",
+      "targets": [{"expr": "sum(rate(recommendation_requests_total{status=\"failure\"}[1m]))", "legendFormat": "failures/s"}],
+      "gridPos": {"h": 5, "w": 6, "x": 6, "y": 7}
+    },
+    {
+      "type": "timeseries",
+      "title": "Recommendation Latency (p95, seconds)",
+      "targets": [{"expr": "histogram_quantile(0.95, sum(rate(recommendation_latency_seconds_bucket[1m])) by (le))", "legendFormat": "p95"}],
+      "gridPos": {"h": 5, "w": 6, "x": 12, "y": 7}
+    },
+    {
+      "type": "stat",
+      "title": "Cold-start Recommendations (per sec)",
+      "targets": [{"expr": "sum(rate(cold_start_recommendations_total[1m]))", "legendFormat": "cold/s"}],
+      "gridPos": {"h": 5, "w": 6, "x": 18, "y": 7}
+    },
+    {
+      "type": "stat",
+      "title": "Recommendations Generated (per sec)",
+      "targets": [{"expr": "sum(rate(recommendations_generated_total[1m]))", "legendFormat": "generated/s"}],
+      "gridPos": {"h": 5, "w": 6, "x": 0, "y": 12}
+    },
+    {
+      "type": "row",
+      "title": "Model Quality",
+      "gridPos": {"h": 1, "w": 24, "x": 0, "y": 17}
+    },
+    {
+      "type": "timeseries",
+      "title": "RMSE",
+      "targets": [{"expr": "model_rmse", "legendFormat": "RMSE"}],
+      "gridPos": {"h": 5, "w": 6, "x": 0, "y": 18}
+    },
+    {
+      "type": "timeseries",
+      "title": "MAE",
+      "targets": [{"expr": "model_mae", "legendFormat": "MAE"}],
+      "gridPos": {"h": 5, "w": 6, "x": 6, "y": 18}
+    },
+    {
+      "type": "timeseries",
+      "title": "Precision@K",
+      "targets": [{"expr": "model_precision_at_k", "legendFormat": "precision_{k}"}],
+      "gridPos": {"h": 5, "w": 6, "x": 12, "y": 18}
+    },
+    {
+      "type": "timeseries",
+      "title": "Recall@K",
+      "targets": [{"expr": "model_recall_at_k", "legendFormat": "recall_{k}"}],
+      "gridPos": {"h": 5, "w": 6, "x": 18, "y": 18}
+    },
+    {
+      "type": "timeseries",
+      "title": "F1@K",
+      "targets": [{"expr": "model_f1_at_k", "legendFormat": "f1_{k}"}],
+      "gridPos": {"h": 5, "w": 6, "x": 0, "y": 23}
+    },
+    {
+      "type": "timeseries",
+      "title": "NDCG@K",
+      "targets": [{"expr": "model_ndcg_at_k", "legendFormat": "ndcg_{k}"}],
+      "gridPos": {"h": 5, "w": 6, "x": 6, "y": 23}
+    },
+    {
+      "type": "timeseries",
+      "title": "Hit Rate@K",
+      "targets": [{"expr": "model_hit_rate_at_k", "legendFormat": "hit_rate_{k}"}],
+      "gridPos": {"h": 5, "w": 6, "x": 12, "y": 23}
+    },
+    {
+      "type": "timeseries",
+      "title": "Coverage",
+      "targets": [{"expr": "model_coverage", "legendFormat": "coverage"}],
+      "gridPos": {"h": 5, "w": 6, "x": 18, "y": 23}
+    },
+    {
+      "type": "timeseries",
+      "title": "Diversity",
+      "targets": [{"expr": "model_diversity", "legendFormat": "diversity"}],
+      "gridPos": {"h": 5, "w": 6, "x": 0, "y": 28}
+    },
+    {
+      "type": "stat",
+      "title": "Current Model Version",
+      "targets": [{"expr": "max by (version) (model_info)", "legendFormat": "{{version}}"}],
+      "gridPos": {"h": 5, "w": 6, "x": 6, "y": 28}
+    },
+    {
+      "type": "row",
+      "title": "Training",
+      "gridPos": {"h": 1, "w": 24, "x": 0, "y": 33}
+    },
+    {
+      "type": "stat",
+      "title": "Training Runs",
+      "targets": [{"expr": "model_training_runs_total", "legendFormat": "runs"}],
+      "gridPos": {"h": 5, "w": 6, "x": 0, "y": 34}
+    },
+    {
+      "type": "stat",
+      "title": "Training Failures",
+      "targets": [{"expr": "model_training_failures_total", "legendFormat": "failures"}],
+      "gridPos": {"h": 5, "w": 6, "x": 6, "y": 34}
+    },
+    {
+      "type": "timeseries",
+      "title": "Training Duration (seconds)",
+      "targets": [{"expr": "model_training_duration_seconds", "legendFormat": "duration"}],
+      "gridPos": {"h": 5, "w": 6, "x": 12, "y": 34}
+    },
+    {
+      "type": "stat",
+      "title": "Training Samples",
+      "targets": [{"expr": "model_training_samples", "legendFormat": "samples"}],
+      "gridPos": {"h": 5, "w": 6, "x": 18, "y": 34}
+    },
+    {
+      "type": "timeseries",
+      "title": "Training MSE",
+      "targets": [{"expr": "model_training_mse", "legendFormat": "mse"}],
+      "gridPos": {"h": 5, "w": 6, "x": 0, "y": 39}
+    },
+    {
+      "type": "row",
+      "title": "Retraining Pipeline (Phase 6)",
+      "gridPos": {"h": 1, "w": 24, "x": 0, "y": 44}
+    },
+    {
+      "type": "stat",
+      "title": "Retraining Runs",
+      "targets": [{"expr": "retraining_runs_total", "legendFormat": "total"}],
+      "gridPos": {"h": 5, "w": 6, "x": 0, "y": 45},
+      "options": {"reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": false}, "graphMode": "area", "colorMode": "background", "justifyMode": "center", "textMode": "value_and_name"}
+    },
+    {
+      "type": "stat",
+      "title": "Successful Promotions",
+      "targets": [{"expr": "model_promotion_total", "legendFormat": "promotions"}],
+      "gridPos": {"h": 5, "w": 6, "x": 6, "y": 45},
+      "options": {"reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": false}, "graphMode": "area", "colorMode": "background", "justifyMode": "center", "textMode": "value_and_name"}
+    },
+    {
+      "type": "stat",
+      "title": "Model Rejections",
+      "targets": [{"expr": "model_rejection_total", "legendFormat": "rejections"}],
+      "gridPos": {"h": 5, "w": 6, "x": 12, "y": 45},
+      "options": {"reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": false}, "graphMode": "area", "colorMode": "background", "justifyMode": "center", "textMode": "value_and_name"}
+    },
+    {
+      "type": "stat",
+      "title": "Retraining Success Rate (%)",
+      "targets": [{"expr": "100 * retraining_success_total / (retraining_success_total + retraining_failure_total)", "legendFormat": "success_rate"}],
+      "gridPos": {"h": 5, "w": 6, "x": 18, "y": 45},
+      "options": {"reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": false}, "graphMode": "area", "colorMode": "background", "justifyMode": "center", "textMode": "value_and_name"}
+    },
+    {
+      "type": "timeseries",
+      "title": "Retraining Duration (seconds)",
+      "targets": [{"expr": "retraining_duration_seconds", "legendFormat": "duration"}],
+      "gridPos": {"h": 5, "w": 12, "x": 0, "y": 50}
+    },
+    {
+      "type": "timeseries",
+      "title": "Champion vs Candidate RMSE",
+      "targets": [{"expr": "champion_model_rmse", "legendFormat": "champion_rmse"}, {"expr": "candidate_model_rmse", "legendFormat": "candidate_rmse"}],
+      "gridPos": {"h": 5, "w": 12, "x": 12, "y": 50}
+    },
+    {
+      "type": "stat",
+      "title": "Current Model Version",
+      "targets": [{"expr": "current_model_version", "legendFormat": "version"}],
+      "gridPos": {"h": 5, "w": 8, "x": 0, "y": 55},
+      "options": {"reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": false}, "graphMode": "area", "colorMode": "background", "justifyMode": "center", "textMode": "value_and_name"}
+    },
+    {
+      "type": "stat",
+      "title": "Drift Status",
+      "targets": [{"expr": "drift_detected", "legendFormat": "drift_status"}],
+      "gridPos": {"h": 5, "w": 8, "x": 8, "y": 55},
+      "options": {"reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": false}, "graphMode": "area", "colorMode": "background", "justifyMode": "center", "textMode": "value_and_name"}
+    },
+    {
+      "type": "stat",
+      "title": "Last Retraining Time",
+      "targets": [{"expr": "last_retraining_timestamp", "legendFormat": "timestamp"}],
+      "gridPos": {"h": 5, "w": 8, "x": 16, "y": 55},
+      "options": {"reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": false}, "graphMode": "area", "colorMode": "background", "justifyMode": "center", "textMode": "value_and_name"}
+    },
+    {
+      "type": "row",
+      "title": "Data",
+      "gridPos": {"h": 1, "w": 24, "x": 0, "y": 60}
+    },
+    {
+      "type": "stat",
+      "title": "Users",
+      "targets": [{"expr": "dataset_users_total", "legendFormat": "users"}],
+      "gridPos": {"h": 5, "w": 8, "x": 0, "y": 61}
+    },
+    {
+      "type": "stat",
+      "title": "Movies",
+      "targets": [{"expr": "dataset_movies_total", "legendFormat": "movies"}],
+      "gridPos": {"h": 5, "w": 8, "x": 8, "y": 61}
+    },
+    {
+      "type": "stat",
+      "title": "Ratings",
+      "targets": [{"expr": "dataset_ratings_total", "legendFormat": "ratings"}],
+      "gridPos": {"h": 5, "w": 8, "x": 16, "y": 61}
+    }
+  ],
+  "templating": {"list": []},
+  "annotations": {"list": []}
+}

@@ -57,6 +57,9 @@ docker-compose up --build
 ```
 - **Frontend Dashboard**: Open `http://localhost` in your browser.
 - **Backend API**: Open `http://localhost:8000`.
+- **MLflow Tracking UI**: Open `http://localhost:5000` to inspect experiments, runs, parameters, metrics, and artifact history.
+
+> Note: The project uses a local SQLite-backed MLflow tracking store in `backend/mlflow.db` and `backend/mlruns` for artifacts.
 
 ---
 

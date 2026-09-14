@@ -1,0 +1,70 @@
+# DVC Pipeline Configuration for Phase 1
+# 
+# Stages:
+# 1. validate - Validate raw dataset against quality rules
+# 2. profile - Generate data profile and statistics
+# 3. preprocess - Clean and process raw data
+# 4. split - Create train/validation/test splits
+# 5. evaluate_baseline - Evaluate Funk SVD baseline model
+
+stages:
+  validate:
+    cmd: cd backend && python -m ml.data_validation
+    deps:
+      - backend/app/database.py
+      - backend/data/ott_recommendation.db
+    outs:
+      - backend/docs/data_quality_report.json
+
+  profile:
+    cmd: cd backend && python -m ml.data_profile
+    deps:
+      - backend/app/database.py
+      - backend/data/ott_recommendation.db
+    outs:
+      - backend/docs/data_profile.json
+      - backend/docs/data_profile.md
+
+  preprocess:
+    cmd: cd backend && python -m ml.preprocess
+    deps:
+      - backend/app/database.py
+      - backend/data/ott_recommendation.db
+      - backend/ml/preprocess.py
+    params:
+      - data.remove_duplicates
+    outs:
+      - backend/data/processed/ratings_processed.csv
+
+  split:
+    cmd: cd backend && python -m ml.split_data
+    deps:
+      - backend/data/processed/ratings_processed.csv
+      - backend/ml/split_data.py
+    params:
+      - data.random_seed
+      - data.train_ratio
+      - data.validation_ratio
+      - data.test_ratio
+    outs:
+      - backend/data/splits/train.csv
+      - backend/data/splits/validation.csv
+      - backend/data/splits/test.csv
+      - backend/data/splits/split_metadata.json
+
+  evaluate_baseline:
+    cmd: cd backend && python -m ml.evaluate_baseline
+    deps:
+      - backend/data/splits/train.csv
+      - backend/data/splits/test.csv
+      - backend/ml/evaluate_baseline.py
+      - backend/app/database.py
+    params:
+      - model.algorithm
+      - model.latent_factors
+      - model.epochs
+      - model.learning_rate
+      - model.regularization
+      - evaluation.k_values
+    outs:
+      - backend/docs/baseline_evaluation.json

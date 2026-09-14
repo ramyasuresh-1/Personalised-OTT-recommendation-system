@@ -1,192 +1,296 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AURA - OTT Recommendations & MLOps Dashboard</title>
-    <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
-    <!-- FontAwesome for Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- ChartJS for Telemetry -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link rel="stylesheet" href="css/style.css">
-</head>
-<body>
-    <div class="glass-bg"></div>
-    <div class="glow glow-1"></div>
-    <div class="glow glow-2"></div>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+    <title>AURA OTT | Recommendation Experience</title>
+    <meta name="description" content="Professional OTT recommendation application powered by the existing recommendation engine and monitoring stack." />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="config.js?v=8c3"></script>
+    <link rel="stylesheet" href="css/style.css?v=8c3" />
+  </head>
+  <body>
+    <!-- ===================== APP SHELL ===================== -->
+    <div class="app-shell" id="app-shell">
 
-    <div class="app-container">
-        <!-- HEADER -->
-        <header class="app-header">
-            <div class="logo">
-                <i class="fa-solid fa-wand-magic-sparkles brand-icon"></i>
-                <h1>AURA<span>OTT</span></h1>
+      <!-- ===================== SIDEBAR ===================== -->
+      <aside class="sidebar shadow-2xl" id="sidebar">
+        <div class="brand-block">
+          <div class="brand-mark"><i class="fa-solid fa-wand-sparkles"></i></div>
+          <div>
+            <p class="brand-label">AURA</p>
+            <h1>OTT</h1>
+          </div>
+        </div>
+
+        <!-- User identity block — shown when authenticated -->
+        <div class="sidebar-user hidden" id="sidebar-user">
+          <div class="sidebar-avatar" id="sidebar-avatar" aria-hidden="true">A</div>
+          <div class="sidebar-user-info">
+            <span class="sidebar-user-name" id="sidebar-user-name">User</span>
+            <span class="sidebar-user-email" id="sidebar-user-email"></span>
+          </div>
+        </div>
+
+        <nav class="nav" aria-label="Main navigation">
+          <div class="nav-section">
+            <p class="nav-heading">Main</p>
+            <button class="nav-button active" data-view="dashboard" type="button">
+              <i class="fa-solid fa-house"></i>
+              <span>Dashboard</span>
+            </button>
+          </div>
+
+          <div class="nav-section">
+            <p class="nav-heading">Discover</p>
+            <button class="nav-button" data-view="movies" type="button">
+              <i class="fa-solid fa-film"></i>
+              <span>Movies</span>
+            </button>
+            <button class="nav-button" data-view="search" type="button">
+              <i class="fa-solid fa-magnifying-glass"></i>
+              <span>Search</span>
+            </button>
+            <button class="nav-button" data-view="genres" type="button">
+              <i class="fa-solid fa-tags"></i>
+              <span>Genres</span>
+            </button>
+          </div>
+
+          <div class="nav-section">
+            <p class="nav-heading">Personal</p>
+            <button class="nav-button" data-view="recommendations" type="button">
+              <i class="fa-solid fa-wand-sparkles"></i>
+              <span>For You</span>
+            </button>
+            <button class="nav-button" data-view="watchlist" type="button">
+              <i class="fa-solid fa-heart"></i>
+              <span>Watchlist</span>
+            </button>
+            <button class="nav-button" data-view="history" type="button">
+              <i class="fa-solid fa-clock-rotate-left"></i>
+              <span>History</span>
+            </button>
+          </div>
+
+          <div class="nav-section">
+            <p class="nav-heading">Insights</p>
+            <button class="nav-button" data-view="analytics" type="button">
+              <i class="fa-solid fa-chart-pie"></i>
+              <span>Analytics</span>
+            </button>
+          </div>
+
+          <div class="nav-section">
+            <p class="nav-heading">Account</p>
+            <button class="nav-button" data-view="profile" type="button">
+              <i class="fa-solid fa-user"></i>
+              <span>Profile</span>
+            </button>
+            <button class="nav-button" data-view="settings" type="button">
+              <i class="fa-solid fa-gear"></i>
+              <span>Settings</span>
+            </button>
+            <button class="nav-button nav-button-logout hidden" id="sidebar-logout-btn" type="button">
+              <i class="fa-solid fa-arrow-right-from-bracket"></i>
+              <span>Log out</span>
+            </button>
+          </div>
+        </nav>
+      </aside>
+
+      <!-- ===================== MAIN PANEL ===================== -->
+      <div class="main-panel">
+        <header class="topbar" id="topbar">
+          <div class="topbar-left">
+            <button class="mobile-menu-toggle" id="mobile-menu-toggle" aria-label="Open navigation" type="button">
+              <i class="fa-solid fa-bars"></i>
+            </button>
+            <div class="topbar-brand">
+              <p class="eyebrow">Personalized streaming</p>
+              <h2>Experience Center</h2>
             </div>
-            <div class="header-meta">
-                <div class="meta-tag">
-                    <span class="meta-label">Model:</span>
-                    <span id="model-version-tag" class="meta-value">Loading...</span>
-                </div>
-                <div class="system-status-pill" id="system-status">
-                    <span class="pulse-dot"></span>
-                    <span id="status-text">Connecting...</span>
-                </div>
+          </div>
+
+          <div class="topbar-actions">
+            <!-- Auth controls -->
+            <div class="auth-controls" id="auth-controls">
+              <span class="auth-user-label hidden" id="auth-user-label"></span>
+              <button class="btn btn-outline" id="auth-open-btn" type="button">
+                <i class="fa-solid fa-right-to-bracket"></i> Log in
+              </button>
+              <button class="btn btn-outline hidden" id="auth-logout-btn" type="button">
+                <i class="fa-solid fa-arrow-right-from-bracket"></i> Log out
+              </button>
             </div>
+            <!-- System health pill -->
+            <div class="status-pill" id="system-status">
+              <span class="pulse-dot"></span>
+              <span id="status-text">Checking</span>
+            </div>
+          </div>
         </header>
 
-        <!-- MAIN LAYOUT -->
-        <main class="dashboard-grid">
-            
-            <!-- LEFT PANEL: OTT RECOMMENDATION CLIENT -->
-            <section class="panel-section client-panel">
-                <div class="panel-header">
-                    <h2><i class="fa-solid fa-clapperboard"></i> OTT Streaming Hub</h2>
-                    <p class="panel-subtitle">Simulate personalized user recommendation requests</p>
-                </div>
-                
-                <!-- User Selector Card -->
-                <div class="card user-card">
-                    <div class="user-selector-group">
-                        <label for="user-select">Select Active User Profile:</label>
-                        <div class="custom-select-wrapper">
-                            <select id="user-select">
-                                <option value="1">User 1 (Sci-Fi & Action Preference)</option>
-                                <option value="16">User 16 (Drama & Comedy Preference)</option>
-                                <option value="35">User 35 (Horror & Action Preference)</option>
-                                <option value="101">User 101 (New Cold-Start User)</option>
-                            </select>
-                            <i class="fa-solid fa-chevron-down select-arrow"></i>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Recommendation Shelf -->
-                <div class="shelf-container">
-                    <h3>Recommended for You</h3>
-                    <div class="movie-grid" id="movie-grid">
-                        <!-- Movies injected dynamically -->
-                        <div class="loading-state">
-                            <i class="fa-solid fa-circle-notch fa-spin"></i>
-                            <p>Fetching recommendations...</p>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- RIGHT PANEL: MLOPS MONITORING CENTER -->
-            <section class="panel-section monitoring-panel">
-                <div class="panel-header">
-                    <h2><i class="fa-solid fa-chart-line"></i> MLOps Monitoring Suite</h2>
-                    <p class="panel-subtitle">Real-time inference logs, data drift tracking & model retraining</p>
-                </div>
-
-                <!-- Metrics Grid -->
-                <div class="metrics-grid">
-                    <div class="metric-card">
-                        <div class="metric-icon blue"><i class="fa-solid fa-bolt"></i></div>
-                        <div class="metric-info">
-                            <span class="metric-val" id="metric-latency">0 ms</span>
-                            <span class="metric-lbl">Avg Latency</span>
-                        </div>
-                    </div>
-                    <div class="metric-card">
-                        <div class="metric-icon purple"><i class="fa-solid fa-chart-simple"></i></div>
-                        <div class="metric-info">
-                            <span class="metric-val" id="metric-requests">0</span>
-                            <span class="metric-lbl">Total Recommendations</span>
-                        </div>
-                    </div>
-                    <div class="metric-card">
-                        <div class="metric-icon green"><i class="fa-solid fa-database"></i></div>
-                        <div class="metric-info">
-                            <span class="metric-val" id="metric-ratings">0</span>
-                            <span class="metric-lbl">Feedback Datapoints</span>
-                        </div>
-                    </div>
-                    <div class="metric-card">
-                        <div class="metric-icon orange"><i class="fa-solid fa-triangle-exclamation"></i></div>
-                        <div class="metric-info">
-                            <span class="metric-val" id="metric-drift">0.0000</span>
-                            <span class="metric-lbl">Drift Index (PSI)</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Charts Area -->
-                <div class="charts-container">
-                    <div class="card chart-card">
-                        <h4>Rating Distribution Drift Check</h4>
-                        <div class="chart-wrapper">
-                            <canvas id="drift-chart"></canvas>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Controls & Retraining -->
-                <div class="card control-card">
-                    <div class="control-header">
-                        <h4>Simulation & Pipeline Control</h4>
-                        <span class="pipeline-status" id="pipeline-status">Idle</span>
-                    </div>
-                    <div class="control-actions">
-                        <button class="btn btn-warning" id="btn-drift-neg">
-                            <i class="fa-solid fa-chart-line-down"></i> Force Rating Drop
-                        </button>
-                        <button class="btn btn-warning" id="btn-drift-pos">
-                            <i class="fa-solid fa-chart-line-up"></i> Force Rating Spike
-                        </button>
-                        <button class="btn btn-primary" id="btn-retrain">
-                            <i class="fa-solid fa-rotate"></i> Trigger Retraining
-                        </button>
-                    </div>
-                    <div class="progress-bar-container" id="progress-container" style="display: none;">
-                        <div class="progress-bar-fill" id="progress-fill"></div>
-                    </div>
-                </div>
-
-                <!-- Console logs -->
-                <div class="card console-card">
-                    <div class="console-header">
-                        <h4>System Logs Console</h4>
-                        <button class="btn-clear" id="btn-clear-console"><i class="fa-solid fa-trash-can"></i> Clear</button>
-                    </div>
-                    <div class="console-body" id="console-logs">
-                        <div class="log-line system">[SYSTEM] Dashboard initialized and listening for telemetry events...</div>
-                    </div>
-                </div>
-            </section>
+        <main class="page-stack">
+          <section class="page active" data-page="home"></section>
+          <section class="page" data-page="dashboard"></section>
+          <section class="page" data-page="movies"></section>
+          <section class="page" data-page="genres"></section>
+          <section class="page" data-page="search"></section>
+          <section class="page" data-page="recommendations"></section>
+          <section class="page" data-page="watchlist"></section>
+          <section class="page" data-page="history"></section>
+          <section class="page" data-page="analytics"></section>
+          <section class="page" data-page="profile"></section>
+          <section class="page" data-page="settings"></section>
         </main>
+      </div>
+    </div><!-- end .app-shell -->
+
+    <!-- ===================== MOVIE DETAIL MODAL ===================== -->
+    <div class="modal-backdrop hidden" id="movie-modal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="movie-modal-title">
+      <div class="modal-card wide">
+        <button class="modal-close" id="movie-modal-close" type="button" aria-label="Close movie details">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+        <div id="movie-modal-content"></div>
+      </div>
     </div>
 
-    <!-- Rating Modal -->
-    <div class="modal-backdrop" id="rating-modal" style="display: none;">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3>Rate Movie</h3>
-                <button class="modal-close-btn" id="modal-close"><i class="fa-solid fa-xmark"></i></button>
-            </div>
-            <div class="modal-body">
-                <p>How would you rate <strong id="modal-movie-title">Movie</strong>?</p>
-                <div class="rating-stars" id="modal-stars">
-                    <i class="fa-regular fa-star star-btn" data-star="1"></i>
-                    <i class="fa-regular fa-star star-btn" data-star="2"></i>
-                    <i class="fa-regular fa-star star-btn" data-star="3"></i>
-                    <i class="fa-regular fa-star star-btn" data-star="4"></i>
-                    <i class="fa-regular fa-star star-btn" data-star="5"></i>
-                </div>
-                <div class="rating-value-label"><span id="rating-num-label">3.0</span> / 5.0</div>
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-secondary" id="modal-cancel">Cancel</button>
-                <button class="btn btn-primary" id="modal-submit">Submit Rating</button>
-            </div>
+    <!-- ===================== RATING MODAL ===================== -->
+    <div class="modal-backdrop hidden" id="rating-modal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="rating-modal-title">
+      <div class="modal-card">
+        <div class="modal-header">
+          <div>
+            <p class="eyebrow">Rate this title</p>
+            <h3 id="rating-modal-title">Movie</h3>
+          </div>
+          <button class="modal-close" id="rating-modal-close" type="button" aria-label="Close rating form">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
         </div>
+        <div class="modal-body">
+          <div class="form-feedback hidden" id="rating-feedback" role="status" aria-live="polite"></div>
+          <div class="rating-stars" id="rating-stars" aria-label="Movie rating selector">
+            <button class="star-button" type="button" data-star="1" aria-label="Rate 1 out of 5"><i class="fa-solid fa-star"></i></button>
+            <button class="star-button" type="button" data-star="2" aria-label="Rate 2 out of 5"><i class="fa-solid fa-star"></i></button>
+            <button class="star-button" type="button" data-star="3" aria-label="Rate 3 out of 5"><i class="fa-solid fa-star"></i></button>
+            <button class="star-button" type="button" data-star="4" aria-label="Rate 4 out of 5"><i class="fa-solid fa-star"></i></button>
+            <button class="star-button" type="button" data-star="5" aria-label="Rate 5 out of 5"><i class="fa-solid fa-star"></i></button>
+          </div>
+          <div class="rating-readout">
+            <span id="rating-value-display">3</span><span> / 5</span>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-ghost" id="rating-cancel" type="button">Cancel</button>
+          <button class="btn btn-primary" id="rating-submit" type="button">Submit rating</button>
+        </div>
+      </div>
     </div>
 
-    <script src="js/app.js"></script>
-</body>
+    <!-- ===================== AUTH MODAL ===================== -->
+    <div class="modal-backdrop hidden" id="auth-modal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="auth-modal-title">
+      <div class="modal-card auth-card">
+        <button class="modal-close" id="auth-modal-close" type="button" aria-label="Close authentication dialog">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+
+        <div class="auth-brand">
+          <div class="auth-brand-mark"><i class="fa-solid fa-wand-sparkles"></i></div>
+          <div>
+            <p class="auth-brand-name">AURA OTT</p>
+            <h3 id="auth-modal-title">Welcome back</h3>
+          </div>
+        </div>
+
+        <div class="auth-tabs" role="tablist" aria-label="Account access">
+          <button class="auth-tab active" id="auth-login-tab" type="button" role="tab" aria-selected="true">Log in</button>
+          <button class="auth-tab" id="auth-register-tab" type="button" role="tab" aria-selected="false">Create account</button>
+        </div>
+
+        <div class="form-feedback hidden" id="auth-feedback" role="alert" aria-live="polite"></div>
+
+        <!-- LOGIN FORM -->
+        <form class="auth-form" id="login-form" novalidate>
+          <div class="form-field">
+            <label for="login-identifier">Username or email</label>
+            <div class="input-wrap">
+              <i class="fa-solid fa-user input-icon"></i>
+              <input id="login-identifier" type="text" required autocomplete="username" placeholder="your@email.com" />
+            </div>
+          </div>
+          <div class="form-field">
+            <label for="login-password">Password</label>
+            <div class="input-wrap">
+              <i class="fa-solid fa-lock input-icon"></i>
+              <input id="login-password" type="password" required autocomplete="current-password" placeholder="••••••••" />
+              <button class="input-toggle-pw" type="button" aria-label="Show password" data-target="login-password">
+                <i class="fa-solid fa-eye"></i>
+              </button>
+            </div>
+          </div>
+          <button class="btn btn-primary btn-full" type="submit" id="login-submit">
+            <span class="btn-text">Log in</span>
+            <span class="btn-spinner hidden"><i class="fa-solid fa-circle-notch fa-spin"></i></span>
+          </button>
+          <p class="auth-switch">Don't have an account? <button type="button" class="link-btn" id="switch-to-register">Create one</button></p>
+        </form>
+
+        <!-- REGISTER FORM -->
+        <form class="auth-form hidden" id="register-form" novalidate>
+          <div class="form-field">
+            <label for="register-username">Username</label>
+            <div class="input-wrap">
+              <i class="fa-solid fa-user input-icon"></i>
+              <input id="register-username" type="text" required autocomplete="username" placeholder="yourname" minlength="3" maxlength="32" />
+            </div>
+            <span class="field-hint">3–32 characters, letters, numbers, underscores only</span>
+          </div>
+          <div class="form-field">
+            <label for="register-email">Email address</label>
+            <div class="input-wrap">
+              <i class="fa-solid fa-envelope input-icon"></i>
+              <input id="register-email" type="email" required autocomplete="email" placeholder="you@email.com" />
+            </div>
+          </div>
+          <div class="form-field">
+            <label for="register-password">Password</label>
+            <div class="input-wrap">
+              <i class="fa-solid fa-lock input-icon"></i>
+              <input id="register-password" type="password" required autocomplete="new-password" placeholder="Min. 8 characters" minlength="8" />
+              <button class="input-toggle-pw" type="button" aria-label="Show password" data-target="register-password">
+                <i class="fa-solid fa-eye"></i>
+              </button>
+            </div>
+          </div>
+          <div class="form-field">
+            <label for="register-confirm">Confirm password</label>
+            <div class="input-wrap">
+              <i class="fa-solid fa-lock input-icon"></i>
+              <input id="register-confirm" type="password" required autocomplete="new-password" placeholder="Repeat password" />
+              <button class="input-toggle-pw" type="button" aria-label="Show confirm password" data-target="register-confirm">
+                <i class="fa-solid fa-eye"></i>
+              </button>
+            </div>
+          </div>
+          <button class="btn btn-primary btn-full" type="submit" id="register-submit">
+            <span class="btn-text">Create account</span>
+            <span class="btn-spinner hidden"><i class="fa-solid fa-circle-notch fa-spin"></i></span>
+          </button>
+          <p class="auth-switch">Already have an account? <button type="button" class="link-btn" id="switch-to-login">Log in</button></p>
+        </form>
+      </div>
+    </div>
+
+    <!-- ===================== JS ===================== -->
+    <script src="js/app.js?v=8c3"></script>
+  </body>
 </html>

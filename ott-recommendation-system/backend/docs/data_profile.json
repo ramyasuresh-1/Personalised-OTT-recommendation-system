@@ -1,0 +1,84 @@
+{
+  "timestamp": "2026-08-11",
+  "dataset_name": "OTT Recommendation System",
+  "data_source": "backend/data/ott_recommendation.db",
+  "size": {
+    "total_ratings": 870,
+    "unique_users": 75,
+    "unique_movies_in_ratings": 20,
+    "total_movies_in_catalog": 20,
+    "max_possible_interactions": 1500,
+    "sparsity_percentage": 42.0
+  },
+  "rating_statistics": {
+    "min": 1.0,
+    "max": 5.0,
+    "mean": 3.4885,
+    "median": 4.0,
+    "std_dev": 1.5534,
+    "p25": 2.0,
+    "p75": 5.0
+  },
+  "rating_distribution": {
+    "counts": {
+      "1.0": 87,
+      "1.5": 89,
+      "2.0": 139,
+      "3.0": 67,
+      "4.0": 67,
+      "4.5": 75,
+      "5.0": 346
+    },
+    "percentages": {
+      "5.0": 39.77,
+      "2.0": 15.98,
+      "3.0": 7.7,
+      "4.0": 7.7,
+      "4.5": 8.62,
+      "1.0": 10.0,
+      "1.5": 10.23
+    }
+  },
+  "user_activity": {
+    "min_ratings_per_user": 5,
+    "max_ratings_per_user": 19,
+    "mean_ratings_per_user": 11.6,
+    "median_ratings_per_user": 10.0,
+    "p25_ratings_per_user": 8.0,
+    "p75_ratings_per_user": 16.5
+  },
+  "movie_popularity": {
+    "min_ratings_per_movie": 35,
+    "max_ratings_per_movie": 55,
+    "mean_ratings_per_movie": 43.5,
+    "median_ratings_per_movie": 43.0,
+    "p25_ratings_per_movie": 41.75,
+    "p75_ratings_per_movie": 46.0
+  },
+  "data_quality": {
+    "missing_user_ids": 0,
+    "missing_movie_ids": 0,
+    "missing_ratings": 0,
+    "duplicate_interactions": 0,
+    "invalid_movie_references": 0
+  },
+  "movie_metadata": {
+    "total_movies": 20,
+    "genres": {
+      "Sci-Fi": 4,
+      "Action": 4,
+      "Drama": 4,
+      "Comedy": 4,
+      "Horror": 4
+    },
+    "year_range": {
+      "min": 2020,
+      "max": 2024
+    }
+  },
+  "cardinality": {
+    "unique_user_ids": 75,
+    "unique_movie_ids": 20,
+    "unique_ratings": 7
+  }
+}

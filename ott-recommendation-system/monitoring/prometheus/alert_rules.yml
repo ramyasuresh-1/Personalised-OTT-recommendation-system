@@ -1,0 +1,66 @@
+groups:
+  - name: ott_recommendation_alerts
+    rules:
+      - alert: OTTBackendDown
+        # Monitors whether Prometheus can scrape the backend target.
+        # Intended expression: up{job="ott_backend"} == 0
+        # This alert remains inactive until Phase 5.
+        expr: 0
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "OTT backend service is down"
+          description: "Placeholder alert for backend availability. Configure the real expression in Phase 5."
+      - alert: OTTHighApiLatency
+        # Monitors API latency using the 95th percentile of http_request_duration_seconds.
+        # Intended expression: histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket[5m])) by (le)) > 1
+        # Replace threshold in Phase 5.
+        expr: 0
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High API latency detected"
+          description: "Placeholder alert for API latency. Enable with a real query after Phase 5 threshold configuration."
+      - alert: OTTHighApiErrorRate
+        # Monitors the error rate for HTTP requests.
+        # Intended expression: sum(rate(http_request_errors_total[5m])) / sum(rate(http_requests_total[5m])) > 0.05
+        # Replace threshold in Phase 5.
+        expr: 0
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High API error rate detected"
+          description: "Placeholder alert for API error rate. Enable with a real query after Phase 5 threshold configuration."
+      - alert: OTTHighCpuUsage
+        # Placeholder for CPU usage alert.
+        # Replace expr with a real CPU metric (e.g. node_cpu_seconds_total or container CPU usage) in Phase 5.
+        expr: 0
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High CPU usage placeholder"
+          description: "CPU usage alert remains inactive until Phase 5 and requires an external system metric."
+      - alert: OTTHighMemoryUsage
+        # Placeholder for memory usage alert.
+        # Replace expr with a real memory metric in Phase 5.
+        expr: 0
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High memory usage placeholder"
+          description: "Memory usage alert remains inactive until Phase 5 and requires an external system metric."
+      - alert: OTTModelPerformanceDegradation
+        # Placeholder for model performance degradation.
+        # Candidate metrics include model_rmse, model_precision_at_k, model_recall_at_k, and others.
+        expr: 0
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Model performance degradation placeholder"
+          description: "Model performance degradation alert remains inactive until Phase 5 and must be configured with actual thresholded metrics."

@@ -1,0 +1,22 @@
+{
+  "status": "PASS",
+  "validation_timestamp": "2026-08-11T15:40:48.323230",
+  "errors": [],
+  "warnings": [],
+  "statistics": {
+    "total_ratings": 870,
+    "unique_users": 75,
+    "unique_movies": 20,
+    "total_movies_in_catalog": 20,
+    "rating_range": {
+      "min": 1.0,
+      "max": 5.0
+    },
+    "rows_checked": 870
+  },
+  "summary": {
+    "total_errors": 0,
+    "total_warnings": 0,
+    "critical": "No"
+  }
+}

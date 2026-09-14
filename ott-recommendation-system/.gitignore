@@ -1,0 +1,54 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.pytest_cache/
+.coverage
+htmlcov/
+*.egg-info/
+
+# Virtual environments
+venv/
+.venv/
+.env-1/
+.venv-1/
+
+# Environment / secrets
+.env
+.env.*
+!.env.example
+
+# Databases / runtime data
+*.db
+*.sqlite
+*.sqlite3
+
+# MLflow
+mlruns/
+mlartifacts/
+
+# DVC cache
+.dvc/cache/
+
+# Logs
+*.log
+logs/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# Node
+node_modules/
+
+# Build / cache
+dist/
+build/
+.next/
+
+# Duplicate generated dataset directory
+backend/backend/

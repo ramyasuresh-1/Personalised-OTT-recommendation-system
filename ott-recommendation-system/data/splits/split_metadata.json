@@ -1,0 +1,15 @@
+{
+  "split_timestamp": "2026-08-11",
+  "random_state": 42,
+  "train_count": 851,
+  "validation_count": 182,
+  "test_count": 183,
+  "total_count": 1216,
+  "train_ratio": 0.6998355263157895,
+  "validation_ratio": 0.14967105263157895,
+  "test_ratio": 0.15049342105263158,
+  "split_strategy": "interaction_level_shuffle",
+  "train_file": "data/splits\\train.csv",
+  "validation_file": "data/splits\\validation.csv",
+  "test_file": "data/splits\\test.csv"
+}

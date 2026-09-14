@@ -1,5 +1,6 @@
 import os
 import sys
+import uuid
 import pytest
 from fastapi.testclient import TestClient
 
@@ -25,8 +26,14 @@ def test_get_movies():
     assert "genre" in movies[0]
 
 def test_get_recommendations():
-    # User 1 is seeded in initial DB seed
-    response = client.get("/api/recommend?user_id=1")
+    suffix = uuid.uuid4().hex[:10]
+    registered = client.post("/api/auth/register", json={
+        "username": f"recommend_{suffix}",
+        "email": f"recommend_{suffix}@example.test",
+        "password": "correct horse battery staple",
+    })
+    assert registered.status_code == 201
+    response = client.get("/api/recommend")
     assert response.status_code == 200
     data = response.json()
     assert "user_id" in data
@@ -34,7 +41,15 @@ def test_get_recommendations():
     assert len(data["recommendations"]) > 0
 
 def test_rate_movie():
-    rate_payload = {"user_id": 999, "movie_id": 1, "rating": 5.0}
+    suffix = uuid.uuid4().hex[:10]
+    registered = client.post("/api/auth/register", json={
+        "username": f"rate_{suffix}",
+        "email": f"rate_{suffix}@example.test",
+        "password": "correct horse battery staple",
+    })
+    assert registered.status_code == 201
+    user_id = registered.json()["user"]["id"]
+    rate_payload = {"user_id": user_id, "movie_id": 1, "rating": 5.0}
     response = client.post("/api/rate", json=rate_payload)
     assert response.status_code == 200
     assert response.json()["status"] == "success"
@@ -46,3 +61,18 @@ def test_get_metrics():
     assert "drift_score" in data
     assert "drift_status" in data
     assert "telemetry" in data
+
+
+def test_health_check():
+    response = client.get("/api/health")
+    assert response.status_code == 200
+    data = response.json()
+    assert data["status"] == "online"
+    assert "model_version" in data
+
+
+def test_prometheus_metrics():
+    response = client.get("/metrics")
+    assert response.status_code == 200
+    assert response.headers["content-type"].startswith("text/plain")
+    assert "# HELP" in response.text
